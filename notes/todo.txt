@@ -1,0 +1,3 @@
+Make settings file
+Put locks on shared objects
+
