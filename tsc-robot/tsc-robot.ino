@@ -1,3 +1,4 @@
+// TODO include SBUS library
 #include "tsc-robot.h"
 
 uint8_t state = STATE_WAITING;
@@ -25,6 +26,7 @@ void loop()
   case STATE_WAITING: // do nothing
     break;
   case STATE_MOVING: // set motor PWM and isMoving
+    // TODO do mecanum calculations (trig)
     // TODO send input levels to motors
     // TODO if input is non-zero, isMoving = true
     break;

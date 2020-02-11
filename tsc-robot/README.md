@@ -2,16 +2,10 @@
 This is the code running on the robot.
 
 ## Hardware
-Currently targeting the Arduino Nano Every microcontroller. R/C hardware TBD.
+Currently targeting the Arduino platform. Receiver is [FrSky XM PLUS](https://www.frsky-rc.com/product/xm-plus/). It takes enough current it must be powered through 5V and GND on the Arduino, _not_ data pins. It uses [SBUS](https://github.com/bolderflight/SBUS) to communicate.
 
 ### Pins
-They are defined in [tsc-robot.h](./tsc-robot.h) as:   
-- 5: left front motor (PWM)
-- 6: right front motor (PWM)
-- 7: charge pressure
-- 8: fire
-- 9: left rear motor (PWM)
-- 10: right rear motor (PWM)
+They are defined in [tsc-robot.h](./tsc-robot.h) for Arduino Mega 2560. Other boards with throw a preprocessor error.
 
 ## Program Architecture
 `setup()` is straightforward.
