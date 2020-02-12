@@ -1,5 +1,5 @@
 #pragma region pins
-#ifdef AVR_MEGA2560
+#ifdef ARDUINO_AVR_MEGA2560
 // Mega 2560 has A0-15, D0-53 but D0 and D1 are serial, D2-13 PWM, D13 LED
 #define PIN_CHARGE 50
 #define PIN_FIRE 52
@@ -28,7 +28,10 @@
 #define STATE_FIRING 3
 #pragma endregion constants
 
+// more readable when writing PWM to digital pins
 #define digitalPWMWrite(X, Y) analogWrite(X, Y)
+// convert the sbus channel short into a byte. default limits on transmitter channels are 172 and 1811, formula from Arduino Reference on map()
+#define sbusMap(X) (byte)((X - 172) * 255 / (1811 - 172))
 
 #pragma region tests
 // make sure all necessary pins were defined
@@ -53,5 +56,4 @@
 #ifndef PIN_SBUS
 #error "Please define PIN_SBUS in tsc-robot.h"
 #endif
-// TODO: verify PIN_SBUS is a serial pin using the Arduino platform #define stuff
 #pragma endregion tests
