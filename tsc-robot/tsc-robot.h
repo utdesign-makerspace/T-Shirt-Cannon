@@ -1,3 +1,4 @@
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma region pins
 #ifdef ARDUINO_AVR_MEGA2560
 // Mega 2560 has A0-15, D0-53 but D0 and D1 are serial, D2-13 PWM, D13 LED
