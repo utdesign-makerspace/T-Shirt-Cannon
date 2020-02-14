@@ -44,28 +44,4 @@
 // convert the sbus channel short into a byte. default limits on transmitter channels are 172 and 1811, formula from Arduino Reference on map()
 #define sbusMap(X) (byte)((X - 172) * 255 / (1811 - 172))
 
-#pragma region tests
-// make sure all necessary pins were defined
-#ifndef PIN_CHARGE
-#error "Please define PIN_CHARGE in tsc-robot.h"
-#endif
-#ifndef PIN_FIRE
-#error "Please define PIN_FIRE in tsc-robot.h"
-#endif
-#ifndef PIN_LF
-#error "Please define PIN_LF in tsc-robot.h"
-#endif
-#ifndef PIN_RF
-#error "Please define PIN_RF in tsc-robot.h"
-#endif
-#ifndef PIN_LR
-#error "Please define PIN_LR in tsc-robot.h"
-#endif
-#ifndef PIN_RR
-#error "Please define PIN_RR in tsc-robot.h"
-#endif
-#ifndef PIN_SBUS
-#error "Please define PIN_SBUS in tsc-robot.h"
-#endif
-#pragma endregion tests
 #endif
