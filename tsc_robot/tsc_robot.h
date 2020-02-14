@@ -1,3 +1,5 @@
+#ifndef TSC_ROBOT_H
+#define TSC_ROBOT_H
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma region pins
 #ifdef ARDUINO_AVR_MEGA2560
@@ -9,6 +11,7 @@
 #define PIN_LR 4
 #define PIN_RR 5
 #define PIN_SBUS 19
+#define PIN_DEBUG_OSCILLO 12
 #else
 #error "Define pins for this board in tsc-robot.h"
 #endif
@@ -18,6 +21,13 @@
 // FrSky XM PLUS delivers 16 channels, with the last one being RSSI
 // TODO: figure out channel architecture and allocation
 // TODO: maybe channels are LR movement, FR movement, charge, and fire
+#define CHANNEL_MOVE_FR 3
+#define CHANNEL_MOVE_LR 2
+//#define CHANNEL_TILT 1 // not currently implemented in robot hardware
+#define CHANNEL_YAW 4
+#define CHANNEL_ARM 5
+#define CHANNEL_CHARGE_CARM 8
+#define CHANNEL_FIRE 9
 #pragma endregion channels
 
 #pragma region constants
@@ -58,3 +68,4 @@
 #error "Please define PIN_SBUS in tsc-robot.h"
 #endif
 #pragma endregion tests
+#endif

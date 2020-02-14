@@ -1,10 +1,15 @@
 #include <SBUS.h>
-#include "tsc-robot.h"
+#define DEBUG_SERIAL
+#define DEBUG_OSCILLO
+#include "tsc_robot.h"
 
 SBUS sbus(Serial1);
 uint16_t channels[16];
 bool isFailSafe;
 bool isLostFrame;
+#ifdef DEBUG_SERIAL
+char printbuf[20];
+#endif
 
 uint8_t state = STATE_WAITING;
 bool isCharging = false;
@@ -14,6 +19,11 @@ unsigned long chargingStart = 0UL;
 
 void setup()
 {
+#ifdef DEBUG_SERIAL
+  Serial.begin(115200);
+  while (!Serial)
+    ;
+#endif
   sbus.begin();
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -23,19 +33,33 @@ void setup()
   pinMode(PIN_RF, OUTPUT);
   pinMode(PIN_LR, OUTPUT);
   pinMode(PIN_RR, OUTPUT);
+  pinMode(PIN_DEBUG_OSCILLO, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop()
 {
-  uint8_t ch1 = 127;
-  uint8_t ch2 = 127;
+#ifdef DEBUG_SERIAL
+  //Serial.println("loop start [slow]: " + millis()); // check how fast the loop is running
+#endif
+#ifdef DEBUG_OSCILLO
+  digitalWrite(PIN_DEBUG_OSCILLO, !digitalRead(PIN_DEBUG_OSCILLO)); // connect pin to oscilloscope to see how fast loop runs
+#endif
+  uint8_t ch_move_fr = 127;
+  uint8_t ch_move_lr = 127;
   // TODO check input for commands, set `state` appropriately
   if (sbus.read(&channels[0], &isFailSafe, &isLostFrame))
   {
-    ch1 = sbusMap(channels[0]);
-    ch2 = sbusMap(channels[1]);
-    if (!(ch1 == 127 && ch2 == 127))
+#ifdef DEBUG_SERIAL
+    for (uint16_t i = 0; i < 9; i++)
+    {
+      sprintf(printbuf, "Channel %hu\t%hu\r\n", i+1, channels[i]);
+      Serial.print(printbuf);
+    }
+#endif
+    ch_move_fr = sbusMap(channels[CHANNEL_MOVE_FR]);
+    ch_move_lr = sbusMap(channels[CHANNEL_MOVE_LR]);
+    if (!(ch_move_fr == 127 && ch_move_lr == 127))
     {
       state = STATE_MOVING;
       isMoving = true;
