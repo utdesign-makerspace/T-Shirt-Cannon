@@ -1,6 +1,8 @@
+#include <stdint.h>
 #include <SBUS.h>
 #define DEBUG_SERIAL
-#define DEBUG_OSCILLO
+//#define DEBUG_OSCILLO
+#define DEBUG_MECANUM
 #include "tsc_robot.h"
 
 SBUS sbus(Serial1);
@@ -16,6 +18,7 @@ bool isCharging = false;
 bool isCharged = false;
 bool isMoving = false;
 unsigned long chargingStart = 0UL;
+mecanum::motors *motors;
 
 void setup()
 {
@@ -35,31 +38,32 @@ void setup()
   pinMode(PIN_RR, OUTPUT);
   pinMode(PIN_DEBUG_OSCILLO, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
+  motors = mecanum::init_motors();
 }
 
 void loop()
 {
-#ifdef DEBUG_SERIAL
-  //Serial.println("loop start [slow]: " + millis()); // check how fast the loop is running
-#endif
 #ifdef DEBUG_OSCILLO
   digitalWrite(PIN_DEBUG_OSCILLO, !digitalRead(PIN_DEBUG_OSCILLO)); // connect pin to oscilloscope to see how fast loop runs
 #endif
-  uint8_t ch_move_fr = 127;
-  uint8_t ch_move_lr = 127;
-  // TODO check input for commands, set `state` appropriately
+  /**************************************
+ * Input section
+ *************************************/
   if (sbus.read(&channels[0], &isFailSafe, &isLostFrame))
   {
 #ifdef DEBUG_SERIAL
     for (uint16_t i = 0; i < 9; i++)
     {
-      sprintf(printbuf, "Channel %hu\t%hu\r\n", i+1, channels[i]);
+      sprintf(printbuf, "Channel %hu\t%hu\r\n", i + 1, channels[i]);
       Serial.print(printbuf);
     }
 #endif
-    ch_move_fr = sbusMap(channels[CHANNEL_MOVE_FR]);
-    ch_move_lr = sbusMap(channels[CHANNEL_MOVE_LR]);
-    if (!(ch_move_fr == 127 && ch_move_lr == 127))
+    mecanum::calculateSpeed(motors,
+                            channels[CHANNEL_MOVE_LR],
+                            channels[CHANNEL_MOVE_FR],
+                            channels[CHANNEL_YAW]);
+
+    if (!(*((uint64_t *)motors) == 0UL)) // check all 4 values at once TODO: imprecision makes this difficult
     {
       state = STATE_MOVING;
       isMoving = true;
@@ -67,49 +71,69 @@ void loop()
     else
     {
       isMoving = false;
-      state = STATE_WAITING; // TODO handle other channels (charging, firing)
+      if (channels[CHANNEL_CHARGE_CARM] == 992)
+      {
+        state = STATE_CHARGING;
+      }
+      else if (channels[CHANNEL_FIRE] == 1811) // cannon arm is checked inside STATE_FIRING handler
+      {
+        state = STATE_FIRING;
+      }
+      else
+      {
+        state = STATE_WAITING;
+      }
     }
     // TODO check SBUS failsafe (transmitter out of range)
   }
 
-  switch (state)
+  /**************************************
+ * Action section
+ *************************************/
+#ifdef DEBUG_SERIAL
+  sprintf(printbuf, "Acting in state %d\n", state);
+  Serial.print(printbuf);
+#endif
+  if (channels[CHANNEL_ARM] > 1800)
   {
-  case STATE_WAITING: // do nothing
-    break;
-  case STATE_MOVING: // set motor PWM and isMoving
-    // TODO do mecanum calculations (trig)
-    // TODO send input levels to motors
-    break;
-  case STATE_CHARGING:
-    if (isCharging)
+    switch (state)
     {
-      if (millis() > chargingStart + CHARGE_TIME_MAX)
+    case STATE_WAITING: // do nothing
+      break;
+    case STATE_MOVING: // set motor PWM
+      // TODO send input levels to motors
+      break;
+    case STATE_CHARGING:
+      if (isCharging)
       {
-        digitalWrite(PIN_CHARGE, LOW);
-        isCharging = false;
-        isCharged = true;
+        if (millis() > chargingStart + CHARGE_TIME_MAX)
+        {
+          digitalWrite(PIN_CHARGE, LOW);
+          isCharging = false;
+          isCharged = true;
+        }
       }
+      else // !isCharging, i.e. start charging
+      {
+        digitalWrite(LED_BUILTIN, HIGH);
+        isCharging = true;
+        chargingStart = millis();
+        digitalWrite(PIN_CHARGE, HIGH);
+      }
+      break;
+    case STATE_FIRING:
+      if (!isMoving && channels[CHANNEL_CHARGE_CARM] == 1811)
+      {
+        digitalWrite(PIN_FIRE, HIGH);
+        delay(500);
+        digitalWrite(PIN_FIRE, LOW);
+        isCharged = false;
+        digitalWrite(LED_BUILTIN, LOW);
+      }
+      break;
+    default: // reset
+      state = STATE_WAITING;
+      break;
     }
-    else // !isCharging, i.e. start charging
-    {
-      digitalWrite(LED_BUILTIN, HIGH);
-      isCharging = true;
-      chargingStart = millis();
-      digitalWrite(PIN_CHARGE, HIGH);
-    }
-    break;
-  case STATE_FIRING:
-    if (!isMoving)
-    {
-      digitalWrite(PIN_FIRE, HIGH);
-      delay(500);
-      digitalWrite(PIN_FIRE, LOW);
-      isCharged = false;
-      digitalWrite(LED_BUILTIN, LOW);
-    }
-    break;
-  default: // reset
-    state = STATE_WAITING;
-    break;
   }
 }

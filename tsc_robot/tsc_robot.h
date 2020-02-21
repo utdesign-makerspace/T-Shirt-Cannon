@@ -19,15 +19,14 @@
 
 #pragma region channels
 // FrSky XM PLUS delivers 16 channels, with the last one being RSSI
-// TODO: figure out channel architecture and allocation
-// TODO: maybe channels are LR movement, FR movement, charge, and fire
-#define CHANNEL_MOVE_FR 3
-#define CHANNEL_MOVE_LR 2
-//#define CHANNEL_TILT 1 // not currently implemented in robot hardware
-#define CHANNEL_YAW 4
-#define CHANNEL_ARM 5
-#define CHANNEL_CHARGE_CARM 8
-#define CHANNEL_FIRE 9
+// remember array indexes (here) are transmitter channel - 1
+#define CHANNEL_MOVE_FR 2
+#define CHANNEL_MOVE_LR 1
+//#define CHANNEL_TILT 0 // not currently implemented in robot hardware
+#define CHANNEL_YAW 3
+#define CHANNEL_ARM 4
+#define CHANNEL_CHARGE_CARM 7
+#define CHANNEL_FIRE 8
 #pragma endregion channels
 
 #pragma region constants
@@ -41,7 +40,18 @@
 
 // more readable when writing PWM to digital pins
 #define digitalPWMWrite(X, Y) analogWrite(X, Y)
-// convert the sbus channel short into a byte. default limits on transmitter channels are 172 and 1811, formula from Arduino Reference on map()
-#define sbusMap(X) (byte)((X - 172) * 255 / (1811 - 172))
+// convert the sbus channel short into a byte range. default limits on transmitter channels are 172 and 1811 (992 is midpoint),
+#define sbusMap(X) (uint16_t)(map(X, 172, 1811, INT8_MIN, INT8_MAX))
+
+#ifdef DEBUG_MECANUM
+#define DEBUG_SERIAL
+#endif
+
+namespace mecanum
+{
+struct motors;
+motors *init_motors();
+void calculateSpeed(motors *toRet, uint16_t x, uint16_t y, uint16_t yaw);
+} // namespace mecanum
 
 #endif
