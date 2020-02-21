@@ -59,9 +59,9 @@ void loop()
     }
 #endif
     mecanum::calculateSpeed(motors,
-                            channels[CHANNEL_MOVE_LR],
-                            channels[CHANNEL_MOVE_FR],
-                            channels[CHANNEL_YAW]);
+                            channels[CHANNEL_MOVE_LR] - SBUS_MIN,
+                            channels[CHANNEL_MOVE_FR] - SBUS_MIN,
+                            channels[CHANNEL_YAW] - SBUS_MIN);
 
     if (!(*((uint64_t *)motors) == 0UL)) // check all 4 values at once TODO: imprecision makes this difficult
     {
@@ -71,11 +71,11 @@ void loop()
     else
     {
       isMoving = false;
-      if (channels[CHANNEL_CHARGE_CARM] == 992)
+      if (channels[CHANNEL_CHARGE_CARM] == SBUS_MID)
       {
         state = STATE_CHARGING;
       }
-      else if (channels[CHANNEL_FIRE] == 1811) // cannon arm is checked inside STATE_FIRING handler
+      else if (channels[CHANNEL_FIRE] == SBUS_MAX) // cannon arm is checked inside STATE_FIRING handler
       {
         state = STATE_FIRING;
       }
@@ -122,7 +122,7 @@ void loop()
       }
       break;
     case STATE_FIRING:
-      if (!isMoving && channels[CHANNEL_CHARGE_CARM] == 1811)
+      if (!isMoving && channels[CHANNEL_CHARGE_CARM] == SBUS_MAX)
       {
         digitalWrite(PIN_FIRE, HIGH);
         delay(500);

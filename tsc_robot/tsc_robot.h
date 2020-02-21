@@ -36,12 +36,17 @@
 #define STATE_MOVING 1
 #define STATE_CHARGING 2
 #define STATE_FIRING 3
+
+#define SBUS_MIN 172
+#define SBUS_MID 992
+#define SBUS_MAX 1811
+#define SBUS_RANGE SBUS_MAX - SBUS_MIN
 #pragma endregion constants
 
 // more readable when writing PWM to digital pins
 #define digitalPWMWrite(X, Y) analogWrite(X, Y)
 // convert the sbus channel short into a byte range. default limits on transmitter channels are 172 and 1811 (992 is midpoint),
-#define sbusMap(X) (uint16_t)(map(X, 172, 1811, INT8_MIN, INT8_MAX))
+// #define sbusMap(X) (uint16_t)(map(X, SBUS_MIN, SBUS_MAX, INT8_MIN, INT8_MAX)) // not currently in use
 
 #ifdef DEBUG_MECANUM
 #define DEBUG_SERIAL
