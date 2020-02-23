@@ -59,9 +59,9 @@ void loop()
     }
 #endif
     mecanum::calculateSpeed(motors,
-                            channels[CHANNEL_MOVE_LR] - SBUS_MIN,
-                            channels[CHANNEL_MOVE_FR] - SBUS_MIN,
-                            channels[CHANNEL_YAW] - SBUS_MIN);
+                            (int16_t)(channels[CHANNEL_MOVE_LR]) - SBUS_MID,
+                            (int16_t)(channels[CHANNEL_MOVE_FR]) - SBUS_MID,
+                            (int16_t)(channels[CHANNEL_YAW]) - SBUS_MID);
 
     if (!(*((uint64_t *)motors) == 0UL)) // check all 4 values at once TODO: imprecision makes this difficult
     {
@@ -96,6 +96,7 @@ void loop()
 #endif
   if (channels[CHANNEL_ARM] > 1800)
   {
+    digitalWrite(PIN_LED_ARM, HIGH);
     switch (state)
     {
     case STATE_WAITING: // do nothing
@@ -136,4 +137,10 @@ void loop()
       break;
     }
   }
+  else
+  {
+    digitalWrite(PIN_LED_ARM, LOW);
+#error "does not stop charging if disarmed while charging. should write all output pins LOW when disarmed"
+  }
+  
 }

@@ -11,7 +11,9 @@
 #define PIN_LR 4
 #define PIN_RR 5
 #define PIN_SBUS 19
-#define PIN_DEBUG_OSCILLO 12
+#define PIN_LED_ARM 12
+#define PIN_LED_BUILTIN 13
+#define PIN_DEBUG_OSCILLO 11
 #else
 #error "Define pins for this board in tsc-robot.h"
 #endif
@@ -22,7 +24,7 @@
 // remember array indexes (here) are transmitter channel - 1
 #define CHANNEL_MOVE_FR 2
 #define CHANNEL_MOVE_LR 1
-//#define CHANNEL_TILT 0 // not currently implemented in robot hardware
+//#define CHANNEL_PITCH 0 // not currently implemented in robot hardware
 #define CHANNEL_YAW 3
 #define CHANNEL_ARM 4
 #define CHANNEL_CHARGE_CARM 7
@@ -57,6 +59,7 @@ namespace mecanum
 struct motors;
 motors *init_motors();
 void calculateSpeed(motors *toRet, uint16_t x, uint16_t y, uint16_t yaw);
+uint8_t mapEsc(int8_t in);
 } // namespace mecanum
 
 #endif
