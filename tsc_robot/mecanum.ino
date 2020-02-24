@@ -24,10 +24,10 @@ void calculateSpeed(motors *toRet, uint16_t x, uint16_t y, uint16_t yaw)
     Serial.print(printbuf);
 #endif
 
-    toRet->leftFront = mapEsc((int8_t)map(x + y + yaw, -3 * SBUS_RANGE, 3 * SBUS_RANGE, -128, 127));
-    toRet->rightFront = mapEsc((int8_t)map(-x + y - yaw, -3 * SBUS_RANGE, 3 * SBUS_RANGE, -128, 127));
-    toRet->rightRear = mapEsc((int8_t)map(-x + y + yaw, -3 * SBUS_RANGE, 3 * SBUS_RANGE, -128, 127));
-    toRet->leftRear = mapEsc((int8_t)map(x + y - yaw , -3 * SBUS_RANGE, 3 * SBUS_RANGE, -128, 127));
+    toRet->leftFront = mapEsc((int8_t)map(x + y + yaw, -3 * (SBUS_MAX - SBUS_MID), 3 * (SBUS_MAX - SBUS_MID), -128, 127));
+    toRet->rightFront = mapEsc((int8_t)map(-x + y - yaw, -3 * (SBUS_MAX - SBUS_MID), 3 * (SBUS_MAX - SBUS_MID), -128, 127));
+    toRet->rightRear = mapEsc((int8_t)map(-x + y + yaw, -3 * (SBUS_MAX - SBUS_MID), 3 * (SBUS_MAX - SBUS_MID), -128, 127));
+    toRet->leftRear = mapEsc((int8_t)map(x + y - yaw , -3 * (SBUS_MAX - SBUS_MID), 3 * (SBUS_MAX - SBUS_MID), -128, 127));
 
 #ifdef DEBUG_MECANUM
     sprintf(printbuf, "FR %hhu\tFL %hhu\tBR %hhu\tBL %hhu\n", toRet->rightFront, toRet->leftFront, toRet->rightRear, toRet->leftRear);
