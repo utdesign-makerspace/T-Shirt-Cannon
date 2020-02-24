@@ -140,7 +140,11 @@ void loop()
   else
   {
     digitalWrite(PIN_LED_ARM, LOW);
-#error "does not stop charging if disarmed while charging. should write all output pins LOW when disarmed"
+    digitalWrite(PIN_CHARGE, LOW);
+    digitalWrite(PIN_LF, LOW);
+    digitalWrite(PIN_RF, LOW);
+    digitalWrite(PIN_LR, LOW);
+    digitalWrite(PIN_RR, LOW);
   }
   
 }
