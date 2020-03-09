@@ -59,9 +59,9 @@ void loop()
     }
 #endif
     mecanum::calculateSpeed(motors,
-                            (int16_t)(channels[CHANNEL_MOVE_LR]) - SBUS_MID,
-                            (int16_t)(channels[CHANNEL_MOVE_FR]) - SBUS_MID,
-                            (int16_t)(channels[CHANNEL_YAW]) - SBUS_MID);
+                            (int16_t)map(channels[CHANNEL_MOVE_LR], SBUS_MIN, SBUS_MAX, -127, 127),
+                            (int16_t)map(channels[CHANNEL_MOVE_FR], SBUS_MIN, SBUS_MAX, -127, 127),
+                            (int16_t)map(channels[CHANNEL_YAW], SBUS_MIN, SBUS_MAX, -127, 127));
 
     if (!(*((uint64_t *)motors) == 0UL)) // check all 4 values at once TODO: imprecision makes this difficult
     {

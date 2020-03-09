@@ -30,3 +30,15 @@ The exception to this fast-`case` rule is the firing state, where there is never
 ## Controls
 
 ![](controls.svg)
+
+## Dev Docs
+
+Servo reaction to PWM:  
+| PWM \[0-255] | Movement       |
+| ------------ | -------------- |
+| 0            | Stop           |
+| 70           | Full reverse   |
+| 127          | Slower reverse |
+| 185          | Stop           |
+| 195          | Slow forwards  |
+| 254          | Full forwards  |

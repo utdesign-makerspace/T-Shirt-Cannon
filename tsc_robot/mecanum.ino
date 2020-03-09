@@ -15,7 +15,7 @@ motors *init_motors()
     return mots;
 }
 
-// y is forward/reverse, x is left/right
+// y is forward/reverse, x is left/right, input range is [-127, 127], output is [0, 255]
 void calculateSpeed(motors *toRet, uint16_t x, uint16_t y, uint16_t yaw)
 {
 #ifdef DEBUG_MECANUM
@@ -24,10 +24,10 @@ void calculateSpeed(motors *toRet, uint16_t x, uint16_t y, uint16_t yaw)
     Serial.print(printbuf);
 #endif
 
-    toRet->leftFront = mapEsc((int8_t)map(x + y + yaw, -3 * (SBUS_MAX - SBUS_MID), 3 * (SBUS_MAX - SBUS_MID), -128, 127));
-    toRet->rightFront = mapEsc((int8_t)map(-x + y - yaw, -3 * (SBUS_MAX - SBUS_MID), 3 * (SBUS_MAX - SBUS_MID), -128, 127));
-    toRet->rightRear = mapEsc((int8_t)map(-x + y + yaw, -3 * (SBUS_MAX - SBUS_MID), 3 * (SBUS_MAX - SBUS_MID), -128, 127));
-    toRet->leftRear = mapEsc((int8_t)map(x + y - yaw , -3 * (SBUS_MAX - SBUS_MID), 3 * (SBUS_MAX - SBUS_MID), -128, 127));
+    toRet->rightFront = mapEsc(-x + y - yaw);
+    toRet->leftFront = mapEsc(x + y + yaw);
+    toRet->rightRear = mapEsc(x + y - yaw);
+    toRet->leftRear = mapEsc(-x + y + yaw);
 
 #ifdef DEBUG_MECANUM
     sprintf(printbuf, "FR %hhu\tFL %hhu\tBR %hhu\tBL %hhu\n", toRet->rightFront, toRet->leftFront, toRet->rightRear, toRet->leftRear);
@@ -37,13 +37,17 @@ void calculateSpeed(motors *toRet, uint16_t x, uint16_t y, uint16_t yaw)
 
 uint8_t mapEsc(int8_t in)
 {
-    if (in > 0)
+    if (in < -10)
     {
-        return (uint8_t)(in >> 1);
+        return (uint8_t)map(-in % -128, -127, 0, 70, 127);
+    }
+    else if (in > 10)
+    {
+        return (uint8_t)map(in % 128, 0, 127, 195, 254);
     }
     else
     {
-        return (uint8_t)in;
+        return (uint8_t)0;
     }
 }
 } // namespace mecanum
