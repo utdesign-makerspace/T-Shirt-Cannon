@@ -22,8 +22,8 @@
 #pragma region channels
 // FrSky XM PLUS delivers 16 channels, with the last one being RSSI
 // remember array indexes (here) are transmitter channel - 1
-#define CHANNEL_MOVE_FR 2
-#define CHANNEL_MOVE_LR 1
+#define CHANNEL_MOVE_Y 2
+#define CHANNEL_MOVE_X 1
 //#define CHANNEL_PITCH 0 // not currently implemented in robot hardware
 #define CHANNEL_YAW 3
 #define CHANNEL_ARM 4

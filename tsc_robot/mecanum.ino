@@ -18,6 +18,18 @@ motors *init_motors()
 // y is forward/reverse, x is left/right, input range is [-127, 127], output is [0, 255]
 void calculateSpeed(motors *toRet, uint16_t x, uint16_t y, uint16_t yaw)
 {
+    if (abs(x) < 10)
+    {
+        x = 0;
+    }
+    if (abs(y) < 10)
+    {
+        y = 0;
+    }
+    if (abs(yaw) < 10)
+    {
+        yaw = 0;
+    }
 #ifdef DEBUG_MECANUM
     char printbuf[30];
     sprintf(printbuf, "x %hd\ty %hd\tyaw %hd\n", x, y, yaw);
